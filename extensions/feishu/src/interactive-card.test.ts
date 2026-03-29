@@ -40,6 +40,18 @@ describe("parseInteractiveCardPayload", () => {
     expect(parsed.text).toBe("Title\nBody");
   });
 
+  it("extracts i18n element text from non-zh locales", () => {
+    const payload = JSON.stringify({
+      header: { title: { content: "Weekly Report" } },
+      i18n_elements: {
+        en_us: [{ tag: "markdown", content: "Delivered in English locale" }],
+      },
+    });
+
+    const parsed = parseInteractiveCardPayload(payload);
+    expect(parsed.text).toBe("Weekly Report\nDelivered in English locale");
+  });
+
   it("caps recursive parsing depth to avoid stack overflow on deeply nested cards", () => {
     let nested: Record<string, unknown> = { tag: "div", text: { content: "leaf" } };
     for (let i = 0; i < 100; i++) {
@@ -51,4 +63,3 @@ describe("parseInteractiveCardPayload", () => {
     expect(parsed.text).toBe("[Interactive Card]");
   });
 });
-

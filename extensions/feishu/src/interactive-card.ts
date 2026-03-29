@@ -151,11 +151,15 @@ function collectCardText(card: InteractiveCardObject): string[] {
     isRecord(card.body) && Array.isArray((card.body as Record<string, unknown>).elements)
       ? ((card.body as Record<string, unknown>).elements as unknown[])
       : [];
-  const i18nElements =
-    isRecord(card.i18n_elements) &&
-    Array.isArray((card.i18n_elements as Record<string, unknown>).zh_cn)
-      ? ((card.i18n_elements as Record<string, unknown>).zh_cn as unknown[])
-      : [];
+  const i18nElements: unknown[] = [];
+  if (isRecord(card.i18n_elements)) {
+    const i18n = card.i18n_elements as Record<string, unknown>;
+    for (const localeElements of Object.values(i18n)) {
+      if (Array.isArray(localeElements)) {
+        i18nElements.push(...localeElements);
+      }
+    }
+  }
 
   for (const element of [...topLevelElements, ...bodyElements, ...i18nElements]) {
     collectElementText(element, lines);
